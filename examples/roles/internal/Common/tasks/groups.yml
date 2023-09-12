@@ -1,0 +1,17 @@
+- name: testing variables
+  debug:
+    msg: "The variable is {{ group }}"
+  when: group is defined
+
+- name: create group {{ item.name}}
+  user:
+    name: "{{ item.name }}"
+    gid: "{{ item.gid | default(omit) }}"
+    local: "{{ item.local | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+    non_unique: "{{ item.non_unique | default(omit) }}"
+    system: "{{ item.system | default(no) }}"
+  loop: "{{ group }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: group is defined

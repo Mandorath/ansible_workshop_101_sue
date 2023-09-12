@@ -1,0 +1,7 @@
+{{ ansible_managed | comment(decoration="#") }}
+
+{% from 'bash_macros.j2' import bash_lines %}
+
+{% if profile is defined %}
+{{ bash_lines(profile) }}
+{% endif %}

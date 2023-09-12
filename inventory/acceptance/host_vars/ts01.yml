@@ -1,0 +1,2 @@
+# Add your host variables here
+chrony_enabled: yes

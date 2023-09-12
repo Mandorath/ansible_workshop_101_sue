@@ -1,0 +1,47 @@
+
+- name: Get user's home dir through ansible.env
+  getent:
+    database: passwd
+    key: "{{ item.name }}"
+
+- name: set home_dir
+  set_fact:
+    home_dir: "{{ getent_passwd[item.name][4] }}"
+
+- name: Set user group
+  set_fact:
+    prim_group: "{{ item.group }}"
+  when: item.group is defined
+
+- name: Set user group based on username if group is not defined
+  set_fact:
+    prim_group: "{{ item.name }}"
+  when: item.group is not defined
+
+- name: manage user bashrc environment file
+  template:
+    src: bashrc.j2
+    dest: "{{ home_dir }}/.bashrc"
+    owner: "{{ item.name }}"
+    group: "{{ prim_group }}"
+    mode: 0644
+  when: bashrc is defined
+
+- name: manage user bash_profile environment file
+  template:
+    src: bash_profile.j2
+    dest: "{{ home_dir }}/.bash_profile"
+    owner: "{{ item.name }}"
+    group: "{{ prim_group }}"
+    mode: 0644
+  when: bash_profile is defined
+
+
+- name: manage user profile environment file
+  template:
+    src: profile.j2
+    dest: "{{ home_dir }}/.profile"
+    owner: "{{ item.name }}"
+    group: "{{ prim_group }}"
+    mode: 0644
+  when: profile is defined

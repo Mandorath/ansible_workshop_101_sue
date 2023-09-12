@@ -1,0 +1,57 @@
+# https://docs.ansible.com/ansible/latest/collections/ansible/posix/firewalld_module.html
+# Requires ansible-galaxy collection install ansible.posix
+# https://github.com/ansible-collections/ansible.posix
+
+
+- name: Combine group and host var firewall rules
+  set_fact:
+    firewalld: "{{ firewalld + host_firewalld }}"
+  when: host_packages is defined
+
+- name: Ensure firewalld packages are installed
+  yum:
+    name: "firewalld"
+    state: installed
+  when: ansible_os_family == "RedHat"
+
+- name: Ensure firewalld packages are installed
+  apt:
+    name: "firewalld"
+    state: present
+  when: ansible_os_family == "Debian"
+
+# Enabled firewalld.
+- name: Ensure firewalld services is started and enabled at boot
+  service:
+    name: "firewalld"
+    state: started
+    enabled: yes
+
+- name: testing variables
+  debug:
+    msg: "The variable is {{ firewalld }}"
+  when: firewalld is defined
+
+- name: create firewall rule {{ item.name }}
+  firewalld:
+    service: "{{ item.service | default(omit) }}"
+    permanent: "{{ item.permanent | default('yes') }}"
+    state: "{{ item.state | default('enabled') }}"
+    zone: "{{ item.zone | default('public') }}"
+    port: "{{ item.port | default(omit) }}"
+    port_forward: "{{ item.port_forward | default(omit) }}"
+    rich_rule: "{{ item.rich_rule | default(omit) }}"
+    interface: "{{ item.interface | default(omit) }}"
+    masquerade: "{{ item.masquerade | default(omit) }}"
+    target: "{{ item.target | default(omit) }}"
+    icmp_block: "{{ item.icmp_block | default(omit) }}"
+    icmp_block_inversion: "{{ item.icmp_block_inversion | default(omit) }}"
+    immediate: "{{ item.immediate | default(omit) }}"
+    offline: "{{ item.offline | default(omit) }}"
+    timeout: "{{ item.timeout | default(omit) }}"
+    source: "{{ item.source | default(omit) }}"
+
+  loop: "{{ firewalld }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: firewalld is defined

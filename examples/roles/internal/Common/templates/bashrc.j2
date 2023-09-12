@@ -1,0 +1,7 @@
+{{ ansible_managed | comment(decoration="#") }}
+# .bashrc
+{% from 'bash_macros.j2' import bash_lines %}
+
+{% if bashrc is defined %}
+{{ bash_lines(bashrc) }}
+{% endif %}

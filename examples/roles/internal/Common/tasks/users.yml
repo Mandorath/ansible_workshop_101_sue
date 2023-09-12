@@ -1,0 +1,54 @@
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/user_module.html
+- name: Combine group and host var users
+  set_fact:
+    user: "{{ user + host_user }}"
+  when: host_user is defined
+
+- name: testing variables
+  debug:
+    msg: "The variable is {{ user }}"
+  when: user is defined
+
+- name: create user {{ item.name}}
+  user:
+    name: "{{ item.name }}"
+    group: "{{ item.group | default(omit) }}"
+    groups: "{{ item.groups | default(omit) }}"
+    state: "{{ item.state | default('present') }}"
+    shell: "{{ item.shell | default('/bin/bash') }}"
+    system: "{{ item.system | default(no) }}"
+    create_home: "{{ item.create_home | default('yes') }}"
+    home: "{{ item.home | default(omit) }}"
+    generate_ssh_key: "{{ item.generate_ssh_key | default('no') }}"
+    force: "{{ item.force | default(omit) }}"
+    password_expire_max : "{{ item.password_expire_max  | default(omit) }}"
+    password_expire_min : "{{ item.password_expire_min  | default(omit) }}"
+    password_lock : "{{ item.password_lock  | default(omit)}}"
+    remove: "{{ item.remove | default(omit) }}"
+    skeleton: "{{ item.skeleton | default(omit) }}"
+    ssh_key_bits: "{{ item.ssh_key_bits | default(omit) }}"
+    ssh_key_file: "{{ item.ssh_key_file | default(omit) }}"
+    ssh_key_passphrase: "{{ item.ssh_key_passphrase | default(omit) }}"
+    ssh_key_type: "{{ item.ssh_key_type | default(omit) }}"
+    ssh_key_comment: "{{ item.ssh_key_comment | default(omit) }}"
+    umask: "{{ item.umask | default(omit) }}"
+    update_password: "{{ item.update_password | default(omit) }}"
+    append: "{{ item.append | default(omit) }}"
+    comment: "{{ item.comment | default(omit) }}"
+    expires: "{{ item.expires | default(omit) }}"
+    local: "{{ item.local | default(omit) }}"
+    move_home: "{{ item.move_home | default(omit) }}"
+    non_unique: "{{ item.non_unique | default(omit) }}"
+    uid: "{{ item.uid | default(omit) }}"
+    password: "{{ item.password | default(omit) }}"
+
+  loop: "{{ user }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: user is defined
+
+- include_tasks: bash_env.yml
+  loop: "{{ user }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: (item.create_home is defined) and (item.create_bash_env == True) and (item.system == False)

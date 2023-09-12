@@ -1,0 +1,29 @@
+---
+- name: baseline configuration for my hosts
+  hosts: webservers
+  become: yes
+  gather_facts: yes
+
+  roles:
+    - { role: ../roles/internal/Common, tags: ["common"] }
+    - { role: ../roles/internal/Chrony, tags: ["chrony"] }
+    - { role: robertdebock.openssh }
+    - { role: robertdebock.snmpd }
+    - { role: robertdebock.selinux }
+    - { role: robertdebock.umask }
+
+- name: install httpd, drbd and pacemaker
+  hosts: webservers
+  become: yes
+  gather_facts: yes
+
+  roles:
+    - { role: robertdebock.httpd }
+
+  # pre_tasks:
+  #   - name: check inventory_hostname
+  #     debug:
+  #       msg: "hostname is {{ inventory_hostname }}"
+    # - name: "Ansible | List all known variables and facts"
+    #   debug:
+    #     var: hostvars[inventory_hostname]

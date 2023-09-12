@@ -1,0 +1,16 @@
+
+packages:
+  - name: python3-pip
+    state: present
+  - name: policycoreutils-python-utils
+    state: present
+  - name: nano
+    state: present
+  - name: lsof
+    state: present
+  - name: sudo
+    state: present
+  - name: open-vm-tools
+    state: present
+  - name: open-vm-tools-desktop
+    state: present

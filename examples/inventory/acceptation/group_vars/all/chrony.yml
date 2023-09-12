@@ -1,0 +1,24 @@
+chrony_service_name: chronyd
+chrony_configfile_path: /etc/chrony.conf
+
+chrony_config_server:
+  - 0.nl.pool.ntp.org iburst
+  - 1.nl.pool.ntp.org iburst
+  - 2.nl.pool.ntp.org iburst
+  - 3.nl.pool.ntp.org iburst
+
+chrony_config_driftfile: /var/lib/chrony/drift
+chrony_config_makestep: 1.0 3
+
+chrony_config_rtcsync: yes
+
+chrony_config_hwtimestamp: ''
+chrony_config_minsources: ''
+
+chrony_config_allow: []
+chrony_config_local_stratum: ''
+
+chrony_config_keyfile: /etc/chrony.keys
+chrony_config_logdir: /var/log/chrony
+
+chrony_config_log: ''

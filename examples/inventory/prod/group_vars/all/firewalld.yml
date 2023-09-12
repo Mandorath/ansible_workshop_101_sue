@@ -1,0 +1,16 @@
+firewalld:
+  - name: Open SSH
+    service: ssh
+    immediate: yes
+    permanent: yes
+    state: enabled
+  - name: snmp
+    service: snmp
+    immediate: yes
+    permanent: yes
+    state: enabled
+  - name: snmptrap
+    service: snmptrap
+    immediate: yes
+    permanent: yes
+    state: enabled

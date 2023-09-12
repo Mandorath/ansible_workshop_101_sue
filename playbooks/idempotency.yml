@@ -1,0 +1,71 @@
+# run this task as:
+# ansible-playbook ./idempotency.yml --tags download
+#
+# then 
+# ansible-playbook ./idempotency.yml --tags run
+# ansible-playbook ./idempotency.yml --tags run
+# ansible-playbook ./idempotency.yml --tags run
+#
+# and finally after the experiment do
+# ansible-playbook ./idempotency.yml --tags clean
+---
+- name: Demonstrate Idempotency
+  hosts: localhost
+  tasks:
+    - name: Ensure target dir exists in /tmp
+      file:
+        path: /tmp/ansible_demo
+        state: directory
+        mode: 0770
+      tags: download
+
+    - name: Obtain a fresh local copy of sshd_config from the openssh git repo
+      get_url:
+        url: "https://raw.githubusercontent.com/openssh/openssh-portable/master/sshd_config"
+        dest: "/tmp/ansible_demo/sshd_config_non_idempotent"
+        mode: 0640
+      tags: download
+
+    - name: Make a copy
+      get_url:
+        url: "https://raw.githubusercontent.com/openssh/openssh-portable/master/sshd_config"
+        dest: "/tmp/ansible_demo/sshd_config_idempotent"
+        mode: 0640
+      tags: download
+
+    - shell: "tree /tmp/ansible_demo/"
+      register: dircontents
+      tags: download
+
+    - name: show dir
+      debug:
+        var: dircontents.stdout_lines
+      tags: download
+
+    - name: Add a config line to a file - breaks idempotency
+      shell: 'echo "PubkeyAuthentication yes" >> /tmp/ansible_demo/sshd_config_non_idempotent'
+      tags: run
+
+    - name: Add a config line to a file - but maintains idempotency
+      lineinfile:
+        path: /tmp/ansible_demo/sshd_config_idempotent
+        regexp: "^#PubkeyAuthentication"
+        state: present
+        line: "PubkeyAuthentication yes"
+      tags: run
+
+    - shell: diff /tmp/ansible_demo/sshd_config_idempotent /tmp/ansible_demo/sshd_config_non_idempotent
+      register: diffout
+      tags: run
+      failed_when: "diffout.rc not in[ 0, 1 ]"
+
+    - name: show diff of files
+      debug:
+        var: diffout.stdout_lines
+      tags: run
+
+    - name: clean up our mess
+      file:
+        path: /tmp/ansible_demo/
+        state: absent
+      tags: clean

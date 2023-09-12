@@ -1,0 +1,25 @@
+
+- name: testing variables
+  debug:
+    msg: "The variable is {{ cron }}"
+  when: cron is defined
+
+- name: create cronjob {{ item.name}}
+  cron:
+    name: "{{ item.name }}"
+    backup: "{{ item.backup | default('no') }}"
+    cron_file: "{{ item.cron_file | default(omit) }}"
+    day: "{{ item.day | default('*') }}"
+    disabled: "{{ item.disabled | default(omit) }}"
+    env: "{{ item.env | default('no') }}"
+    minute: "{{ item.minute | default('*') }}"
+    hour: "{{ item.hour | default('*') }}"
+    state: "{{ item.state | default('present')}}"
+    job: "{{ item.job | default(omit) }}"
+    user: "{{ item.user | default('root')}}"
+    weekday: "{{ item.weekday | default('*') }}"
+
+  loop: "{{ cron }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: cron is defined

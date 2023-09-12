@@ -1,0 +1,13 @@
+---
+- name: Install & configure Time service
+  hosts: timeservers
+  tasks:
+    - name: install the chrony package
+      apt:
+        name: "{{ chrony_package }}"
+        state: present
+    - name:
+      systemd:
+        name: {{ chrony_daemon }}
+        state: started
+        enabled: "{{ chrony_enabled }}"

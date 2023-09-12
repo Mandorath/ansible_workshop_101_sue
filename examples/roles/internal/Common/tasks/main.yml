@@ -1,0 +1,38 @@
+- name: Configure hostname
+  include_tasks:
+    file: hostname.yml
+  tags:
+    - hostname
+
+- name: Install yum packages
+  include_tasks:
+    file: packages.yml
+  tags:
+    - packages
+  when: ansible_os_family == "RedHat"
+- name: Install apt packages
+  include_tasks:
+    file: apt_packages.yml
+  tags:
+    - packages
+  when: ansible_os_family == "Debian"
+- name: Configure cron
+  include_tasks:
+    file: cronjobs.yml
+  tags:
+    - cronjobs
+- name: Configure Firewalld
+  include_tasks:
+    file: firewalld.yml
+  tags:
+    - firewalld
+- name: Configure groups
+  include_tasks:
+    file: groups.yml
+  tags:
+    - groups
+- name: Configure Users
+  include_tasks:
+    file: users.yml
+  tags:
+    - users

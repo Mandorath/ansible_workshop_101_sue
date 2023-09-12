@@ -1,0 +1,9 @@
+# cron:
+#   backup: no
+#   day: "*"
+#   env: "no"
+#   minute: "*"
+#   hour: "*"
+#   state: "present"
+#   user: "root"
+#   weekday: "*"

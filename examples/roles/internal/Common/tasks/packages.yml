@@ -1,0 +1,46 @@
+# https://docs.ansible.com/ansible/latest/collections/ansible/builtin/yum_module.html
+- name: Combine group and host var packages
+  set_fact:
+    packages: "{{ packages + host_packages }}"
+  when: host_packages is defined
+
+- name: testing variables
+  debug:
+    msg: "The variable is {{ packages }}"
+  when: packages is defined
+
+- name: Install package {{ item.name}}
+  yum:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('present') }}"
+    enablerepo: "{{ item.enablerepo | default(omit) }}"
+    allow_downgrade: "{{ item.allow_downgrade | default(omit) }}"
+    autoremove: "{{ item.autoremove | default(omit) }}"
+    bugfix: "{{ item.bugfix | default(omit) }}"
+    cacheonly: "{{ item.cacheonly | default(omit) }}"
+    conf_file: "{{ item.conf_file | default(omit) }}"
+    disable_excludes: "{{ item.disable_excludes | default(omit) }}"
+    disable_gpg_check: "{{ item.disable_gpg_check | default('no') }}"
+    disable_plugin: "{{ item.disable_plugin | default(omit) }}"
+    disablerepo: "{{ item.disablerepo | default(omit) }}"
+    download_dir: "{{ item.download_dir | default(omit) }}"
+    download_only: "{{ item.download_only | default(omit) }}"
+    enable_plugin: "{{ item.enable_plugin | default(omit) }}"
+    exclude: "{{ item.exclude | default(omit) }}"
+    install_repoquery: "{{ item.install_repoquery | default('yes') }}"
+    install_weak_deps: "{{ item.install_weak_deps | default(omit) }}"
+    installroot: "{{ item.installroot | default(omit) }}"
+    list: "{{ item.list | default(omit) }}"
+    lock_timeout: "{{ item.lock_timeout | default(omit) }}"
+    releasever: "{{ item.releasever | default(omit) }}"
+    security: "{{ item.security | default(omit) }}"
+    skip_broken: "{{ item.skip_broken | default(omit) }}"
+    update_cache: "{{ item.update_cache | default(omit) }}"
+    update_only: "{{ item.update_only | default(omit) }}"
+    use_backend: "{{ item.use_backend | default(omit) }}"
+    validate_certs: "{{ item.validate_certs | default('yes') }}"
+
+  loop: "{{ packages }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: packages is defined

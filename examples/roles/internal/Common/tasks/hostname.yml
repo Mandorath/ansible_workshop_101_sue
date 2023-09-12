@@ -1,0 +1,7 @@
+
+
+- name: Set the hostname
+  ansible.builtin.hostname:
+    name: "{{ hostname }}"
+    use: "{{ hostname_strategy }}"
+  when: hostname is defined

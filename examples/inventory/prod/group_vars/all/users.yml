@@ -1,0 +1,37 @@
+bashrc:
+  - |
+    # Source global definitions
+    if [ -f /etc/bashrc ]; then
+          . /etc/bashrc
+    fi
+  - |
+    if ! [[ "$PATH" =~ "$HOME/.local/bin:$HOME/bin:" ]]
+    then
+        PATH="$HOME/.local/bin:$HOME/bin:$PATH"
+    fi
+  - export PATH
+  - |
+    # Uncomment the following line if you don't like systemctl's auto-paging feature:
+    # export SYSTEMD_PAGER=
+  - |
+    # User specific aliases and functions
+
+bash_profile:
+  - |
+    # Get the aliases and functions
+    if [ -f ~/.bashrc ]; then
+            . ~/.bashrc
+    fi
+  - |
+    # User specific environment and startup programs
+
+    PATH=$PATH:$HOME/.local/bin:$HOME/bin
+
+    export PATH
+  - export PS1="[\u@\h\e[0;31m(acc)\e[0m> \W]# "
+
+
+#    password: $6$flhwhgvE1vlV.vMh$E7eZy5/SHLUTgVDbqk9b.SdxiC4CuxVHzXlcG8dNG5tuV1FVX1/XscHegc0uGvd9JNGvzQm04cuxfn3bDX0fV.
+
+
+#    password: $6$RI6Gr3QRXRbpS8Xo$M2eiStlzJLxXeKExei9KDxDLJVM8ZeeoAMK4NQCLO/SmW8sZQ5w4oFlVeRcdu2MCpT/D11XIjR9C2er/VnjZ1/

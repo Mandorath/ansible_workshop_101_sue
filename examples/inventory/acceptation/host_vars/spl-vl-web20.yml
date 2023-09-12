@@ -1,0 +1,35 @@
+---
+# See https://docs.ansible.com/ansible/2.3/cron_module.html for parameter
+# details.
+hostname: spl-vl-web20.of.worlds.com
+hostname_strategy: systemd
+
+user:
+  - name: maurice
+    uid: 9999
+    group: sudo
+    state: present
+    shell: /bin/bash
+    system: no
+    home: /home/maurice
+    password: "{{ maurice_default | password_hash('sha512') }}"
+
+group:
+  - name: dummy
+    uid: 1003
+    state: present
+    system: no
+
+host_firewalld:
+  - name: Open messageservice port
+    port: 8108/tcp
+    immediate: yes
+    permanent: yes
+    state: enabled
+
+file_operations:
+  - name: fix pollkit cve
+    path: /usr/sbin/pvexec
+    mode: '0755'
+    owner: root
+    group: root

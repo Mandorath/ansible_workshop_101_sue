@@ -1,0 +1,31 @@
+httpd_servername: localhost
+httpd_ssl_servername: localhost
+
+httpd_locations:
+  - name: my_location
+    location: /my_location
+    backend_url: "http://localhost:8080/myapplication"
+httpd_vhosts:
+  - name: some_site
+    # documentroot: "{{ httpd_data_directory }}/webdata.conf"
+    server_url: 192.168.56.2
+    httpd_port: 443
+    servertokens: Prod
+    serversignature: "Off"
+    servername: mysite.of.worlds.com
+
+group_firewalld:
+  - name: Open https port
+    port: 443/tcp
+    immediate: yes
+    permanent: yes
+    state: enabled
+  - name: Open drbd port
+    port: 7789/tcp
+    immediate: yes
+    permanent: yes
+    state: enabled
+
+group_packages:
+  - name: python-venv
+    state: present

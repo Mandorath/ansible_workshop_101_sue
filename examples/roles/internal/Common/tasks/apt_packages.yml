@@ -1,0 +1,41 @@
+- name: Combine group and host var packages
+  set_fact:
+    packages: "{{ packages + host_packages }}"
+  when: host_packages is defined
+
+- name: testing variables
+  debug:
+    msg: "The variable is {{ packages }}"
+  when: packages is defined
+
+- name: Install package {{ item.name}}
+  apt:
+    name: "{{ item.name }}"
+    state: "{{ item.state | default('present') }}"
+    allow_downgrade: "{{ item.allow_downgrade | default(omit) }}"
+    autoremove: "{{ item.autoremove | default(omit) }}"
+    allow_change_held_packages : "{{ item.allow_change_held_packages | default(omit) }}"
+    allow_unauthenticated : "{{ item.allow_unauthenticated | default(omit) }}"
+    autoclean: "{{ item.autoclean | default(omit) }}"
+    cache_valid_time: "{{ item.cache_valid_time | default(omit) }}"
+    clean: "{{ item.clean | default('no') }}"
+    deb: "{{ item.deb | default(omit) }}"
+    disablerepo: "{{ item.disablerepo | default(omit) }}"
+    dpkg_options: "{{ item.dpkg_options | default(omit) }}"
+    fail_on_autoremove: "{{ item.fail_on_autoremove | default(omit) }}"
+    force: "{{ item.force | default(omit) }}"
+    force_apt_get: "{{ item.force_apt_get | default(omit) }}"
+    install_recommends: "{{ item.install_recommends | default(omit) }}"
+    lock_timeout: "{{ item.lock_timeout | default(omit) }}"
+    only_upgrade: "{{ item.only_upgrade | default(omit) }}"
+    policy_rc_d: "{{ item.policy_rc_d | default(omit) }}"
+    purge: "{{ item.purge | default(omit) }}"
+    update_cache: "{{ item.update_cache | default(omit) }}"
+    update_cache_retries: "{{ item.update_cache_retries | default(omit) }}"
+    update_cache_retry_max_delay: "{{ item.update_cache_retry_max_delay | default(omit) }}"
+    upgrade: "{{ item.upgrade | default(omit) }}"
+
+  loop: "{{ packages }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when: packages is defined

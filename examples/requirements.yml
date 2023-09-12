@@ -1,0 +1,13 @@
+roles:
+  - src: robertdebock.bootstrap
+  - src: robertdebock.openssh
+  - src: robertdebock.snmpd
+  - src: robertdebock.selinux
+  - src: robertdebock.umask
+  - src: robertdebock.httpd
+  - src: https://github.com/ansible-community/ansible-vault.git
+    name: ansible-community.ansible-vault
+    scm: git
+    version: 2022.07.01
+collections:
+  - name: ansible.posix
