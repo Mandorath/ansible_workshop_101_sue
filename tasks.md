@@ -193,8 +193,8 @@ sudo apt list ufw
 ```
 
 ## Task 5. **Create an new playbook and ansible task that adds the controller node SSH key of the automator user to the authorized keys of the in automated (sudo) user.**
-Create a new file in playbooks called my_playbook.yml
-Add the following content:
+
+Add the following content to my_playbook.yml:
 
 ```yaml
 - name: Add my authorized key
@@ -284,28 +284,160 @@ You can check the roles/Chrony/defaults/main.yml file. This file tends to contai
 
 Add the variable that defines the chrony config servers to the inventory/acceptance/group_vars/timeservers.yml file. Then run the playbook.
 
-To run the playbook:
+Run the playbook:
 
-```
+```shell
 ansible-playbook -i inventory/acceptance/hosts.yml playbooks/my_playbook.yml
 ```
 
 Log into on of the ansible nodes and check if the new servers are configured.
 
-```
+```shell
 ssh -l automator <ip address of ansible node>
 less /etc/chrony.conf
 ```
 
-## Task 7. **Create a reusable ansible task/role that creates the users.**
-  - shawn, uid=1800, group=spencer, make sure shawn has sudo access
-  - burton, uid=1830, group=guster
-  - carlton, uid=1840, group=lassiter
-  - mary, uid=1850, group=lightly
+## Task 7. **Create a reusable ansible task/role that creates the users and groups specified below.
 
-  - Hint; something with conditionals.
+```
+- shawn, uid=1800, group=spencer
+- burton, uid=1830, group=guster
+- carlton, uid=1840, group=lassiter
+- mary, uid=1850, group=lightly
+```
+
+Create a new file in inventory/acceptance/group_vars/all/users.yml and define all the users as defined above:
+
+```yaml
+group:
+  - name: spencer
+    state: present
+    system: no
+
+user:
+  - name: shawn
+    group: spencer
+    state: present
+    password: "{{ <your password> | password_hash  }}"
+    uid: 1800
+```
+
+Use the example above to specify the other users.
+
+Create a new play in your my_playbook.yml:
+
+```yaml
+- name: Add my authorized key
+  hosts: all
+  become: no
+  gather_facts: yes
+  tasks:
+    - name: create group {{ item.name}}
+      user:
+        name: "{{ item.name }}"
+        gid: "{{ item.gid | default(omit) }}"
+        local: "{{ item.local | default(omit) }}"
+        state: "{{ item.state | default('present') }}"
+        non_unique: "{{ item.non_unique | default(omit) }}"
+        system: "{{ item.system | default(no) }}"
+    - name: create user {{ item.name}}
+      user:
+        name: "{{ item.name }}"
+        group: "{{ item.group | default(omit) }}"
+        groups: "{{ item.groups | default(omit) }}"
+        uid: "{{ item.uid | default(omit) }}"
+        password: "{{ item.password | default(omit) }}"
+      loop: "{{ user }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: user is defined
+```
+
+---
+
+:memo: **Note**
+You see two filters being used here, one for creating hash which will be used instead of the plaintext password. The other is to provide a default value, in case a variable is not defined. However in this case a 'special' value is provided called *omit*, this omits the line if no variable with a value is provided. There are many, many more filters available. Take a look at the Ansible documentation for this.
+
+https://docs.ansible.com/archive/ansible/2.3/playbooks_filters.html
+
+---
+
+Run the playbook:
+
+```shell
+ansible-playbook -i inventory/acceptance/hosts.yml playbooks/my_playbook.yml
+```
+
+Log into on of the ansible nodes and check if the users are created.
+
+```shell
+ssh -l shawn <ip address of ansible node>
+```
 
 ## Task 8. **Install an ansible role from ansible-galaxy with which you can disable root password login for SSH and configures the motd banner for your SSH prompt.**
-  - Hint; R. de bock might be able to help you.
+We are going to install an external role add this to our playbook and run it with some variables we provide.
 
-## Task 9. **Create a second inventory for a production environment and configure your second VM using everything you created in the previous tasks.**
+Run the command to install the external role:
+
+```
+ansible-galaxy install robertdebock.openssh
+```
+
+Now create a new variable file in inventory/acceptance/group_vars/all/openssh.yml and add the following contents:
+
+```yaml
+openssh_permit_root_login: "no"
+openssh_banner: This is my fancy banner!
+```
+
+Now add the following to your playbook:
+
+```yaml
+---
+- name:	setup ssh
+  hosts: all
+  connection: ssh
+  roles:
+    - { role: robertdebock.openssh, tags: ["ssh"] }
+```
+
+Run the playbook:
+
+```shell
+ansible-playbook -i inventory/acceptance/hosts.yml playbooks/my_playbook.yml
+```
+
+Log into on of the ansible nodes and check if the banner has changed.
+
+```shell
+ssh -l automator <ip address of ansible node>
+```
+
+## Task 9. **Run only specific plays using a tag. Create a new vault file and add all your password to the vault file. Use the vault file in your ansible run.**
+
+
+Run the ansible playbook 
+
+```shell
+ansible-playbook -i inventory/acceptance/hosts.yml playbooks/my_playbook.yml --tag chrony
+ansible-playbook -i inventory/acceptance/hosts.yml playbooks/my_playbook.yml --tag ssh
+```
+
+In both commands only the chrony or ssh play should run.
+
+
+Try some of the test commands:
+
+```shell 
+# Debug the connection from your control host with the ping module
+ansible -i <inventory_file> <pattern> -m ping
+
+# Curious if your inventory correctly groups the hosts? Add the –list-hosts parameter
+ansible -i <inventory_file> <pattern> --list-hosts 
+
+# Alternatively you can print all the facts gathered by ansible for a set of hosts using the setup module
+ansible -i <inventory_file> <pattern> -m setup
+
+```
+
+With all the knowledge you have learned I am going to let you try to setup Vault yourself. You can find information on setting up a vault file in examples/README.md
