@@ -1,7 +1,7 @@
 ---
 # See https://docs.ansible.com/ansible/2.3/cron_module.html for parameter
 # details.
-hostname: spl-vl-web20.of.worlds.com
+hostname: web10.of.worlds.com
 hostname_strategy: systemd
 
 user:

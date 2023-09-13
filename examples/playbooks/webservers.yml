@@ -12,13 +12,26 @@
     - { role: robertdebock.selinux }
     - { role: robertdebock.umask }
 
-- name: install httpd, drbd and pacemaker
-  hosts: webservers
+- name: install httpd
+  hosts: apache
   become: yes
   gather_facts: yes
 
   roles:
     - { role: robertdebock.httpd }
+
+- name: install nginx
+  hosts: nginx
+  become: yes
+  gather_facts: yes
+  roles:
+    - { role: nginxinc.nginx }
+    - { role: nginxinc.nginx_config }
+  tasks:
+    - name: Remove default nginx file 
+      ansible.builtin.file:
+        path: /etc/nginx/conf.d/default.conf
+        state: absent
 
   # pre_tasks:
   #   - name: check inventory_hostname

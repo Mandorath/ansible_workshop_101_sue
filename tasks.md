@@ -87,7 +87,7 @@ nano inventory/acceptance/hosts.yml
 ```
 
 ---
-(U+1F4DD) **Note**
+:memo: **Note**
 
 Is it wise to specify a plaintext (root) password or use root in your inventory file? 
   - Find a way to circumvent this and still run ansible with the required privileges.
@@ -95,10 +95,9 @@ Is it wise to specify a plaintext (root) password or use root in your inventory 
 
 ---
 
+In case you have finished your 
 ```
-
-```
-ansible-inventory --list -y
+ansible-inventory -i inventory/acceptation/hosts.yml --list```
 ```
 
 ## Task 4. **Create an ansible task that adds your SSH key to the authorized keys of the in task 3 created sudo user.**
