@@ -46,12 +46,17 @@ python -m pip install ansible
 ```
 Name an advantage and disadvantage of each of the methods.
 
-Hint; if you install ansible using your package manager check the version of ansible that is installed. Older versions might have differences or the latest and greatest external roles/collections won't work!
+---
+**HINT**
+
+If you install ansible using your package manager check the version of ansible that is installed. Older versions might have differences or the latest and greatest external roles/collections won't work!
   - The default ubuntu yammy ansible(-core) version is 2.10.8, if you want a newer version collect the ansible package from pypi (2.13.16) or the ppa ansible repository (2.13.6).
   - If you choose to use pypi a python virtual environment might help you!
 
+---
+
 ## Task 2. **Prepare your ansible VMs.**
-You need to prepare your VMs so that ansible can connect to the VMs. Ansible essentially needs an IP address the name of a given node. As a name is more user friendly we will use this, however we do not have a DNS server running, we can update the hosts file on the controller to do the ip to name translation for us to connect to the ansible nodes.
+You need to prepare your VMs so that ansible can connect to the VMs. Ansible essentially needs an IP address or the name of a given node. As a name is more user friendly we will use this, however we do not have a DNS server running, we can update the hosts file on the controller to do the ip to name translation for us to connect to the ansible nodes.
   - Update the hosts file of your ansiblecontroller with the names and ip addresses the nodes you are going to configure.
 
 ```
@@ -66,26 +71,30 @@ echo 192.168.0.102 ansiblenode02.ansibleworkshop.sue.nl >> /etc/hosts
 git clone https://github.com/Mandorath/ansible_workshop_101_sue.git
 ```
 
-- Change into the directory
+- Change into the cloned directory
 
 ```
 cd ansible_workshop_101_sue
 ```
 
 ## Task 3. **Configure the ansiblenode0x in the inventory provided to you in the root of the GIT repository. Debug any problems you encounter when running ansible.**
-  - Please check the inventory file, make sure the ansible host matches the DNS/host names of the VMs created in task 2.
-    - You can find the inventory file in inventory/acceptance/hosts.yml
+- Please check the inventory file, make sure the ansible host matches the DNS/host names of the VMs created in task 2.
+  - You can find the inventory file in inventory/acceptance/hosts.yml
 
 ```
 # Use you editor of choice
 nano inventory/acceptance/hosts.yml
 ```
 
-  - Is it wise to specify a plaintext (root) password or use root in your inventory file? 
-    - Find a way to circumvent this and still run ansible with the required privileges.
-    - Hint; become sudo.
+---
+(U+1F4DD) **Note**
 
-```
+Is it wise to specify a plaintext (root) password or use root in your inventory file? 
+  - Find a way to circumvent this and still run ansible with the required privileges.
+  - Hint; become sudo.
+
+---
+
 ```
 
 ```
