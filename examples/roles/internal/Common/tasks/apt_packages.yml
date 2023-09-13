@@ -9,7 +9,7 @@
   when: packages is defined
 
 - name: Install package {{ item.name}}
-  apt:
+  ansible.builtin.apt:
     name: "{{ item.name }}"
     state: "{{ item.state | default('present') }}"
     allow_downgrade: "{{ item.allow_downgrade | default(omit) }}"

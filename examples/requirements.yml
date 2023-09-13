@@ -5,6 +5,8 @@ roles:
   - src: robertdebock.selinux
   - src: robertdebock.umask
   - src: robertdebock.httpd
+  - src: nginxinc.nginx
+  - src: nginxinc.nginx_config
   - src: https://github.com/ansible-community/ansible-vault.git
     name: ansible-community.ansible-vault
     scm: git
