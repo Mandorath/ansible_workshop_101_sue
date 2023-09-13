@@ -13,10 +13,10 @@ chrony_configfile_path: /etc/chrony.conf
 # Please consider joining the pool (http://www.pool.ntp.org/join.html).
 # Type: list
 chrony_config_server:
-  - 0.nl.pool.ntp.org iburst
-  - 1.nl.pool.ntp.org iburst
-  - 2.nl.pool.ntp.org iburst
-  - 3.nl.pool.ntp.org iburst
+  - 0.europe.pool.ntp.org iburst
+  - 1.europe.pool.ntp.org iburst
+  - 2.europe.pool.ntp.org iburst
+  - 3.europe.pool.ntp.org iburst
 
 # Record the rate at which the system clock gains/losses time.
 # Type: string

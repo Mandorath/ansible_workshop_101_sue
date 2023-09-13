@@ -14,15 +14,15 @@ git clone [repo]
 
 Run ansible for a specific role:
 ```
-ansible-playbook -i inventory/production/hosts.yml plays/httpd.yml
+ansible-playbook -i inventory/production/hosts.yml playbooks/httpd.yml
 ```
 
 Run ansible for a specific node (usefull for node specific runs not done remotely).
 
 ```
-ansible-playbook --limit spl-vl-web20 -i inventory/acceptation/hosts.yml plays/httpd.yml
+ansible-playbook --limit spl-vl-web20 -i inventory/acceptation/hosts.yml playbooks/httpd.yml
 ```
-!! This requires that you have ansible installed locally and your inventory file/plays points to localhost!!
+!! This requires that you have ansible installed locally and your inventory file/playbooks points to localhost!!
 
 # Run Ansible from central node, and remotely configure nodes
 
@@ -55,7 +55,7 @@ all:
 We prefer not to store password in plain-text so you can provide the --ask-pass parameter on the command line, in this case ansible will ask you to specify a password.
 
 ```
-ansible-playbook --limit spl-vl-web20 -i inventory/acceptation/hosts.yml plays/httpd.yml --ask-pass
+ansible-playbook --limit spl-vl-web20 -i inventory/acceptation/hosts.yml playbooks/httpd.yml --ask-pass
 ```
 
 If you see the following error:
@@ -125,7 +125,7 @@ all:
 To use the vault file during an ansible run the following command can be used:
 
 ```
-ansible-playbook --limit spl-vl-web20 -i acceptation/hosts.yml plays/webservers.yml --ask-vault-pass --extra-vars '@vault_acc.yml'
+ansible-playbook --limit spl-vl-web20 -i acceptation/hosts.yml playbooks/webservers.yml --ask-vault-pass --extra-vars '@vault_acc.yml'
                  --limit [only run ansible for this host]
                                       -i [inventory file, var dirs are relative to the directory of the inventory file]
                                                                [run this play(book)]
