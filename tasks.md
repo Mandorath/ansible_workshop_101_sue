@@ -23,7 +23,7 @@ You will have three nodes available:
   - ansiblenode0x        --> Node we will configure
   - ansiblenode0x        --> Node we will configure
 
-Task 1. **Install ansible on your ansiblecontroller{0x} and use this as your control node.**
+## Task 1. **Install ansible on your ansiblecontroller{0x} and use this as your control node.**
 
 In essense you have two primary methods to setup ansible. The first is to use the package manager to install ansible on your control node:
 
@@ -50,7 +50,7 @@ Hint; if you install ansible using your package manager check the version of ans
   - The default ubuntu yammy ansible(-core) version is 2.10.8, if you want a newer version collect the ansible package from pypi (2.13.16) or the ppa ansible repository (2.13.6).
   - If you choose to use pypi a python virtual environment might help you!
 
-Task 2. **Prepare your ansible VMs.**
+## Task 2. **Prepare your ansible VMs.**
 You need to prepare your VMs so that ansible can connect to the VMs. Ansible essentially needs an IP address the name of a given node. As a name is more user friendly we will use this, however we do not have a DNS server running, we can update the hosts file on the controller to do the ip to name translation for us to connect to the ansible nodes.
   - Update the hosts file of your ansiblecontroller with the names and ip addresses the nodes you are going to configure.
 
@@ -72,7 +72,7 @@ git clone https://github.com/Mandorath/ansible_workshop_101_sue.git
 cd ansible_workshop_101_sue
 ```
 
-Task 3. **Configure the ansiblenode0x in the inventory provided to you in the root of the GIT repository. Debug any problems you encounter when running ansible.**
+## Task 3. **Configure the ansiblenode0x in the inventory provided to you in the root of the GIT repository. Debug any problems you encounter when running ansible.**
   - Please check the inventory file, make sure the ansible host matches the DNS/host names of the VMs created in task 2.
     - You can find the inventory file in inventory/acceptance/hosts.yml
 
@@ -92,25 +92,25 @@ nano inventory/acceptance/hosts.yml
 ansible-inventory --list -y
 ```
 
-Task 4. **Create an ansible task that adds your SSH key to the authorized keys of the in task 3 created sudo user.**
+## Task 4. **Create an ansible task that adds your SSH key to the authorized keys of the in task 3 created sudo user.**
   - Create or modify a file (ansible has modules for this) and add your ssh public key to the authorized_keys file.
   - Hint; ansible has a module for this.
 
 
-5. **Create an  ansible task that can install a package, install lsof and firewalld using this task.**
+## Task 5. **Create an  ansible task that can install a package, install lsof and firewalld using this task.**
   - Hint; ansible has a module for this :-)
 
-6. **Create an ansible task that installs and configures chrony. Make sure that chrony uses four of the dutch time servers (nl.pool.ntp.org).**
+## Task 6. **Create an ansible task that installs and configures chrony. Make sure that chrony uses four of the dutch time servers (nl.pool.ntp.org).**
   - Hint; Maybe a jinja can help :-)
 
-7. **Create a reusable ansible task/role that creates the users.**
+## Task 7. **Create a reusable ansible task/role that creates the users.**
   - shawn, uid=1800, group=spencer, make sure shawn has sudo access
   - burton, uid=1830, group=guster
   - carlton, uid=1840, group=lassiter
   - mary, uid=1850, group=lightly
   - Hint; something with conditionals.
 
-8. **Install an ansible role from ansible-galaxy with which you can disable root password login for SSH and configures the motd banner for your SSH prompt.**
+## Task 8. **Install an ansible role from ansible-galaxy with which you can disable root password login for SSH and configures the motd banner for your SSH prompt.**
   - Hint; R. de bock might be able to help you.
 
-9. **Create a second inventory for a production environment and configure your second VM using everything you created in the previous tasks.**
+## Task 9. **Create a second inventory for a production environment and configure your second VM using everything you created in the previous tasks.**
