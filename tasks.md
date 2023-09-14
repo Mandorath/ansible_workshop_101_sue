@@ -161,20 +161,8 @@ This could be achieved by *becoming* root or by using sudo. Check the example in
 
 In case you have finished your inventory you can check it using the following command:
 ```shell
-export ANSIBLE_HOST_KEY_CHECKING=False
 ansible-inventory -i inventory/acceptance/hosts.yml --list
 ```
-
----
-:memo: **Note**
-
-The export of the ANSIBLE_HOST_KEY_CHECKING variable is required or Ansible fails to use ssh with password authentication. If you want to see what happens set the value to True as shown below and run Ansible again.
-
-```shell
-export ANSIBLE_HOST_KEY_CHECKING=True
-```
-
----
 
 ## Task 4. **Create an ansible play that installs and removes packages, install lsof, nginx and remove the ufw package using one ore more tasks using variables.**
 Create a new file in playbooks/ called my_playbook.yml
@@ -202,7 +190,7 @@ Create a new *play* by adding the following content, and modifying it to install
 Setup new variables in inventory/acceptance/group_vars/all/packages.yml
 
 ```yaml
-firewalld_state: present
+nginx_state: present
 ```
 
 Repeat the steps above for the lsof and ufw packages.
@@ -218,14 +206,25 @@ Repeat the steps above for the lsof and ufw packages.
 
 To run the playbook:
 
-```
+```shell
+export ANSIBLE_HOST_KEY_CHECKING=False
 ansible-playbook -i inventory/acceptance/hosts.yml playbooks/my_playbook.yml
 ```
 
+---
+:memo: **Note**
+
+The export of the ANSIBLE_HOST_KEY_CHECKING variable is required or Ansible fails to use ssh with password authentication. If you want to see what happens set the value to True as shown below and run Ansible again.
+
+```shell
+export ANSIBLE_HOST_KEY_CHECKING=True
+```
+
+---
 
 Log into one of the ansible nodes and check if you can see if the packages are installed or removed:
 
-```
+```shell
 sudo apt list firewalld
 sudo apt list lsof
 sudo apt list ufw
@@ -247,8 +246,9 @@ Add the following content to my_playbook.yml:
         state: present
         key: "{{ lookup('file', '/home/<my_user>/.ssh/<my_key>') }}"
 ```
+replace the user with automator and he key with the location of your ssh key.
 
-Create an ssh key for the automator user on the controller node:
+To create an ssh key for the automator user on the controller node:
 
 ```shell
 ssh-keygen -t Ed25519
@@ -283,8 +283,8 @@ Chrony is tool/daemon used on modern Linux systems to keep time synchronized. As
 
 Copy the Chrony folder to the roles directory in the root of the workshop directory.
 
-```
-cp -r examples/roles/internalChrony roles/
+```shell
+cp -r examples/roles/internal/Chrony roles/
 ```
 
 Add the following play to your playbook
@@ -296,8 +296,40 @@ Add the following play to your playbook
   gather_facts: yes
 
   roles:
-    - { role: Chrony, tags: ["chrony"] }
+    - { role: ../roles/Chrony, tags: ["chrony"] }
 ```
+
+---
+
+:memo: **Note**
+By default Ansible will check for a roles directory relative to where you are running the playbook from. Because we defined our roles directory next to our playbook director we need to explicitely define where ansible can find the Chrony role.
+
+```yaml
+../roles/Chrony
+```
+
+If we would not att the ../roles in our current setup we would see the following error:
+
+```shell
+ERROR! the role 'Chrony' was not found in /home/automator/ansible_workshop_101_sue/playbooks/roles:/home/automator/.ansible/roles:/usr/share/ansible/roles:/etc/ansible/roles:/home/automator/ansible_workshop_101_sue/playbooks
+
+The error appears to be in '/home/automator/ansible_workshop_101_sue/playbooks/my_playbook.yml': line 27, column 7, but may
+be elsewhere in the file depending on the exact syntax problem.
+
+The offending line appears to be:
+
+  roles:
+    - { role: Chrony, tags: ["chrony"] }
+      ^ here
+```
+
+This error however highlights some of the default locations ansible will look for roles. You can also manipulate where Ansible looks via the ansible configuration file ansible.cfg
+
+---
+
+You can check the roles/Chrony/defaults/main.yml file. This file tends to contain a set of default variables.  
+
+Add the variable that defines the *chrony config servers* to the inventory/acceptance/group_vars/timeservers.yml file.
 
 ---
 
@@ -315,14 +347,6 @@ Add the following play to your playbook
     mode: 0664
 ```
 
-You can see the template in roles/Chrony/templates/chrony.conf.j2, where the j2 extension indicates jinja2.
-
----
-
-You can check the roles/Chrony/defaults/main.yml file. This file tends to contain a set of default variables.  
-
-Add the variable that defines the chrony config servers to the inventory/acceptance/group_vars/timeservers.yml file. Then run the playbook.
-
 Run the playbook:
 
 ```shell
@@ -335,6 +359,8 @@ Log into on of the ansible nodes and check if the new servers are configured.
 ssh -l automator <ip address of ansible node>
 less /etc/chrony.conf
 ```
+
+These should be {x}.nl.pool.ntp.org e.g. 0.nl.pool.ntp.org
 
 ## Task 7. **Create a reusable ansible task/role that creates the users and groups specified below.
 
@@ -371,7 +397,7 @@ Create a new play in your my_playbook.yml:
   become: no
   gather_facts: yes
   tasks:
-    - name: create group {{ item.name}}
+    - name: create group "{{ item.name}}"
       user:
         name: "{{ item.name }}"
         gid: "{{ item.gid | default(omit) }}"
@@ -379,7 +405,11 @@ Create a new play in your my_playbook.yml:
         state: "{{ item.state | default('present') }}"
         non_unique: "{{ item.non_unique | default(omit) }}"
         system: "{{ item.system | default(no) }}"
-    - name: create user {{ item.name}}
+      loop: "{{ group }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when: group is defined
+    - name: create user "{{ item.name}}"
       user:
         name: "{{ item.name }}"
         group: "{{ item.group | default(omit) }}"
@@ -416,17 +446,24 @@ ssh -l shawn <ip address of ansible node>
 ## Task 8. **Install an ansible role from ansible-galaxy with which you can disable root password login for SSH and configures the motd banner for your SSH prompt.**
 We are going to install an external role add this to our playbook and run it with some variables we provide.
 
-Run the command to install the external role:
+You can install a role directly from ansible-galaxy which is a repository that contains opensource roles and collections.
 
-```
+```shell
 ansible-galaxy install robertdebock.openssh
+```
+
+However you can also directly install external roles from a version control system such as Gitlab, Github or Bitbucket. Please use the command below to install the external role directly from github.
+
+```shell
+ansible-galaxy install git+https://github.com/robertdebock/ansible-role-openssh.git,5.0.0 -vvvv
 ```
 
 Now create a new variable file in inventory/acceptance/group_vars/all/openssh.yml and add the following contents:
 
 ```yaml
 openssh_permit_root_login: "no"
-openssh_banner: This is my fancy banner!
+openssh_banner: /etc/ssh/my_banner
+
 ```
 
 Now add the following to your playbook:
@@ -436,8 +473,18 @@ Now add the following to your playbook:
 - name:	setup ssh
   hosts: all
   connection: ssh
+  tasks:
+    - name: Create the SSH banner file
+      ansible.builtin.copy:
+        backup: True
+        src: ~/ansible_workshop_101_sue/tux.txt
+        dest: "{{ openssh_banner }}"
+        force:  false
+        group: root
+        mode: '0644'
+        owner: root
   roles:
-    - { role: robertdebock.openssh, tags: ["ssh"] }
+    - { role: ansible-role-openssh, tags: ["ssh"] }
 ```
 
 Run the playbook:
