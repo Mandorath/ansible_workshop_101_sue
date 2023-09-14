@@ -43,13 +43,15 @@ Disadvantage: Usually an older version
 You could use python to setup a ansible. virtual environment 
 
 ```shell
+# Install the virtualenv package
+sudo apt install python3-virtualenv
 # Create a virtualenv if one does not already exist
-python -m virtualenv ansible
+python3 -m virtualenv ansible
 
 # Activate the virtual environment 
 source ansible/bin/activate 
 
-python -m pip install ansible
+python3 -m pip install ansible -v
 ```
 
 Advantage: Likelihood of installing (python) package that conflict with system required python packages is near zero.
@@ -60,9 +62,31 @@ Disadvantage: More complex setup.
 ---
 :memo: **Note**
 
+When using pypi (pip) there are some problems retrieving packages on an IPv6 enabled system. In our case I have disabled IPv6 on the system.
+
+```
+sudo su -
+echo net.ipv6.conf.all.disable_ipv6 = 1 >> /etc/sysctl.conf
+echo net.ipv6.conf.default.disable_ipv6 = 1 >> /etc/sysctl.conf
+echo net.ipv6.conf.lo.disable_ipv6 = 1 >> /etc/sysctl.conf
+echo net.ipv6.conf.tun0.disable_ipv6 = 1 >> /etc/sysctl.conf
+```
+
+---
+
+---
+:memo: **Note**
+
 If you install ansible using your package manager check the version of ansible that is installed. Older versions might have differences or the latest and greatest external roles/collections won't work!
-  - The default ubuntu yammy ansible(-core) version is 2.10.8, if you want a newer version collect the ansible package from pypi (2.13.16) or the ppa ansible repository (2.13.6).
+  - The default ubuntu 22.04 ansible(-core) version is 2.9.6, if you want a newer version collect the ansible package from pypi (2.13.12) or the ppa ansible repository (2.13.12).
   - If you choose to use pypi a python virtual environment might help you!
+  - You can install Ansible using your package manager ans still create a python virtual-environment to run Ansible from in case you want to use a newer version!
+
+You can check this yourself by running the folowing command inside or outside the python virtual environment.
+
+```
+ansible --version
+```
 
 ---
 
@@ -71,9 +95,12 @@ You need to prepare your VMs so that ansible can connect to the VMs. Ansible ess
 - Update the /etc/hosts file of your ansiblecontroller with the names and ip addresses the nodes you are going to configure.
 
 ```shell
+sudo su -
 echo <ansiblenode0x ip address> <ansiblenode0x FQDN> >> /etc/hosts
 # For example
-echo 192.168.0.102 ansiblenode02.ansibleworkshop.sue.nl >> /etc/hosts
+echo 192.168.5.102 ansiblenode02.ansibleworkshop.sue.nl >> /etc/hosts
+echo 192.168.5.103 ansiblenode03.ansibleworkshop.sue.nl >> /etc/hosts
+exit
 ```
 
 - Clone the repository with example to your controller node:
@@ -103,7 +130,7 @@ Modify the DNS names in the file, replace <ansiblenode0x.ansibleworkshop.sue.nl>
 
 ```yaml
 all:
-  childeren:
+  children:
     timeservers:
       hosts:
         ts01:
@@ -134,10 +161,22 @@ This could be achieved by *becoming* root or by using sudo. Check the example in
 
 In case you have finished your inventory you can check it using the following command:
 ```shell
-ansible-inventory -i inventory/acceptation/hosts.yml --list
+export ANSIBLE_HOST_KEY_CHECKING=False
+ansible-inventory -i inventory/acceptance/hosts.yml --list
 ```
 
-## Task 4. **Create an ansible play that installs and removes packages, install lsof, firewalld and remove the ufw package using one ore more tasks using variables.**
+---
+:memo: **Note**
+
+The export of the ANSIBLE_HOST_KEY_CHECKING variable is required or Ansible fails to use ssh with password authentication. If you want to see what happens set the value to True as shown below and run Ansible again.
+
+```shell
+export ANSIBLE_HOST_KEY_CHECKING=True
+```
+
+---
+
+## Task 4. **Create an ansible play that installs and removes packages, install lsof, nginx and remove the ufw package using one ore more tasks using variables.**
 Create a new file in playbooks/ called my_playbook.yml
 
 ```shell
@@ -153,10 +192,10 @@ Create a new *play* by adding the following content, and modifying it to install
   become: yes
   gather_facts: yes
   tasks:
-    - name: Install the lsof package
+    - name: Install the nginx package
       ansible.builtin.apt:
-        name: firewalld
-        state: {{ firewalld_state }}   <-- absent = remove package, present = install package
+        name: nginx
+        state: "{{ nginx_state }}"   <-- absent = remove package, present = install package
 
 ```
 
@@ -211,7 +250,7 @@ Add the following content to my_playbook.yml:
 
 Create an ssh key for the automator user on the controller node:
 
-```
+```shell
 ssh-keygen -t Ed25519
 ```
 
