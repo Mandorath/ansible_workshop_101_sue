@@ -37,9 +37,10 @@ sudo apt install ansible
 ```
 
 Advantage: Ansible is setup with a single command.
+
 Disadvantage: Usually an older version
 
-** Method 2**: Use python pip (in a virtual environment)
+**Method 2**: Use python pip (in a virtual environment)
 You could use python to setup a ansible. virtual environment 
 
 ```shell
@@ -55,9 +56,12 @@ python3 -m pip install ansible -v
 ```
 
 Advantage: Likelihood of installing (python) package that conflict with system required python packages is near zero.
+
 Advantage: Allows you to setup the latest or multiple versions of Ansbile on the same node.
-Advantage: You can create a identical setup across different Linux distributions
-Disadvantage: More complex setup.
+
+Advantage: You can create a identical setup across different Linux distributions.
+
+Disadvantage: More complex setup. Espcially if you want to freeze versions and automate the rollout of the python virtual environment.
 
 ---
 :memo: **Note**
@@ -115,7 +119,7 @@ git clone https://github.com/Mandorath/ansible_workshop_101_sue.git
 cd ansible_workshop_101_sue
 ```
 
-## Task 3. **Configure the ansiblenode0x in the inventory provided to you in the root of the GIT repository. Debug any problems you encounter when running ansible.**
+## Task 3. **Configure the ansiblenode0x in the inventory provided to you in the root of the GIT repository.**
 Please check the inventory file, make sure the ansible host matches the DNS/host names of the VMs you added to the hosts file in task 2.
 You can find the inventory file in inventory/acceptance/hosts.yml
 
