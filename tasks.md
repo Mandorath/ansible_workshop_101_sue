@@ -160,7 +160,7 @@ ansible-vault view vault_demo.yml
 ```
 ---
 
-You can change the *ansible_user* to a different user, however that user is not root. In case you still need to execute privileged commands on a remote node Ansible needs to know how.
+You can change the *ansible_user* to a different user, however in case that user is not root you can't run privilegd commands or access most files. In case you still need to execute privileged commands on a remote node, Ansible needs to know how.
 This could be achieved by *becoming* root or by using sudo. Check the example in examples/inventory/acceptance/hosts.yml to see how to specify the SSH password, how you could use sudo and how to specify a password for this. For now you can add the password as plaintext into the hosts.yml file, ofcourse **never** to this for **any** environment, always use secure methods for providing the password!
 
 In case you have finished your inventory you can check it using the following command:
